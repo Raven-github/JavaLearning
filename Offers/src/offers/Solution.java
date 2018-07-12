@@ -2,9 +2,13 @@ package offers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Set;
 import java.util.Stack;
+
+import javax.swing.text.html.HTMLDocument.HTMLReader.ParagraphAction;
 
 public class Solution {
 	public static void main(String[] args) {
@@ -21,11 +25,6 @@ public class Solution {
 		n3.right = null;
 		n2.left = n6;
 		n2.right = null;
-
-		// System.out.println(new Solution().TreeDepth(n1));
-		// Long s = System.currentTimeMillis();
-		// System.out.println(new Solution().Convert(n1).val);
-		// System.out.println(System.currentTimeMillis()-s);
 		ListNode l1 = new ListNode(1);
 		ListNode l2 = new ListNode(2);
 		ListNode l3 = new ListNode(3);
@@ -37,80 +36,119 @@ public class Solution {
 		l3.next = l4;
 		l5.next = l3;
 		l6.next = l5;
-		// System.out.println(new Solution().FindFirstCommonNode(l1, null).val);
+		char[] a = {'a'};
+		char[] b = { 'a', '.' };
+		System.out.println(new Solution().match(a, b));
+	}
 
-		// System.out.println(new Solution().EntryNodeOfLoop(l1).val);
-		// System.out.println(new Solution().deleteDuplication(l1));
-		/*
-		 * l1 = new Solution().deleteDuplication(l1); while (l1 != null) {
-		 * System.out.println(l1.val); l1 = l1.next; }
-		 */
-		// System.out.println(new Solution().StrToInt("-123"));
-		// Long s1 = System.currentTimeMillis();
-		// System.out.println(new Solution().GetUglyNumber_Solution(1000));
-		// System.out.println(System.currentTimeMillis() - s1);
-		//
-		// //HashSet<String> ss=new HashSet<>();
-		// ArrayList<String> ss=new ArrayList<>();
-		// ss.add("bb");
-		// ss.add("aa");
-		// System.out.println(ss);
-		// String ss = "aaaaaaaabbbbbssdsdsdsdsccssssssk";
-		// int x = new Solution().FirstNotRepeatingChar(ss);
-		// System.out.println(x);
-		// System.out.println(ss.charAt(x));
-		// int[] a = { 0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 4, 5, 6, 7 };
-		// // System.out.println(new Solution().InversePairs(a));
-		// System.out.println(new Solution().GetNumberOfK(a, 2));
-		int[] a = { 4, 6, 2, 2, 3, 3, 8, 8, 9, 9, 1000000, 1000000 };
-		int[] num1 = new int[1];
-		int[] num2 = new int[1];
-		new Solution().FindNumsAppearOnce(a, num1, num2);
-		// System.out.println(num1[0] + "------------------" + num2[0]);
-		// System.out.println(new Solution().FindContinuousSequence(9));
-		// int[] num = { 0, 0, 0, 0, 9 };
-		// System.out.println(new Solution().FindNumbersWithSum(num, -9));
-		// String ss = "student. a am I";
-		// System.out.println(new Solution().ReverseSentence(ss));
-		// System.out.println(new Solution().isContinuous(num));
-		// ArrayList<TreeNode> ad = new ArrayList<>();
-		// ad.add(null);
-		// System.out.println(ad.size());
-		// Long s1 = System.currentTimeMillis();
-		// System.out.println(new Solution().LastRemaining_Solution(10000, 2));
-		// System.out.println(System.currentTimeMillis() - s1);
-		//System.out.println(new Solution().Print(n1));
-		System.out.println(new Solution().Serialize(n1));
+	public boolean match(char[] str, char[] pattern) {
+
+		if (str.length == 0 && pattern.length == 0) {
+			return true;
+		}
+
+		if (str.length == 0 && pattern.length == 1 && pattern[0] == '.') {
+			return false;
+		}
+		if (str.length == 0 && pattern.length == 2 && pattern[1] == '*') {
+			return true;
+		}
+		int i = 0;
+		int j = 0;
+		while (i <= str.length - 1 && j <= pattern.length - 1) {
+			if (str[i] == pattern[j] || pattern[j] == '.') {
+				i++;
+				j++;
+			} else if (str[i] != pattern[j]) {
+				if (pattern[j] == '*') {
+					j++;
+				} else if (pattern[j + 1] == '*') {
+					j = j + 2;
+				} else {
+					return false;
+				}
+			}
+		}
+		
+		if ((i <= str.length - 1 && j > pattern.length - 1) || (i > str.length - 1 && j <= pattern.length - 1)) {
+			if(j == pattern.length - 2 && pattern[j]=='*'){
+				return true;
+			}
+			if(j == pattern.length - 3 && pattern[j+2]=='*'){
+				return true;
+			}
+			return false;
+		}
+		return true;
+	}
+
+	public int[] multiply(int[] A) {
+		if (A == null || A.length == 0) {
+			return null;
+		}
+		ArrayList<Integer> startEnd = new ArrayList<Integer>();
+		ArrayList<Integer> endStart = new ArrayList<Integer>();
+		int len = A.length - 1;
+		startEnd.add(A[0]);
+		endStart.add(A[len]);
+		for (int i = 1; i < len; i++) {
+			startEnd.add(A[i] * startEnd.get(i - 1));
+			endStart.add(A[len - i] * endStart.get(i - 1));
+		}
+		int[] b = new int[A.length];
+		b[0] = endStart.get(endStart.size() - 1);
+		b[b.length - 1] = startEnd.get(startEnd.size() - 1);
+		for (int i = 1; i < b.length - 1; i++) {
+			b[i] = startEnd.get(i - 1) * endStart.get(endStart.size() - 1 - i);
+		}
+		return b;
 	}
 
 	public boolean duplicate(int numbers[], int length, int[] duplication) {
-		if(numbers.length==0 || numbers==null){
+		if (numbers.length == 0 || numbers == null) {
+			duplication[0] = -1;
 			return false;
 		}
+		int[] nums = Arrays.copyOfRange(numbers, 0, length);
+		Arrays.sort(numbers);
+		boolean flag = false;
+		Set<Integer> sets = new HashSet<Integer>();
+		for (int i = 1; i < length; i++) {
+			if (numbers[i] == numbers[i - 1]) {
+				flag = true;
+				sets.add(numbers[i]);
+			}
+		}
+		for (int i = 0; i < length; i++) {
+			if (sets.contains(nums[i])) {
+				duplication[0] = nums[i];
+				break;
+			}
+		}
+		return flag;
 	}
-	
-	
+
 	public String Serialize(TreeNode root) {
 		if (root == null) {
 			return "#!";
 		}
-		StringBuilder sb=new StringBuilder();
-		ArrayList<ArrayList<TreeNode>> list=Print(root);
-		sb.append(root.val+"!");
+		StringBuilder sb = new StringBuilder();
+		ArrayList<ArrayList<TreeNode>> list = Print(root);
+		sb.append(root.val + "!");
 		for (int i = 1; i < list.size(); i++) {
-			ArrayList<TreeNode> temp=list.get(i-1);
-			int count=0;
-			for(int j=0;j<temp.size();j++){
-				if(temp.get(j).left!=null){
-					sb.append(list.get(i).get(count++).val+"!");
-				}else{
+			ArrayList<TreeNode> temp = list.get(i - 1);
+			int count = 0;
+			for (int j = 0; j < temp.size(); j++) {
+				if (temp.get(j).left != null) {
+					sb.append(list.get(i).get(count++).val + "!");
+				} else {
 					sb.append("#!");
 				}
-				
-				if(temp.get(j).right!=null){
-					sb.append(list.get(i).get(count++).val+"!");
-				}else{
-					
+
+				if (temp.get(j).right != null) {
+					sb.append(list.get(i).get(count++).val + "!");
+				} else {
+
 					sb.append("#!");
 				}
 			}
