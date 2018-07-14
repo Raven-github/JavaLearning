@@ -2,15 +2,16 @@ package offers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
 
-import javax.swing.text.html.HTMLDocument.HTMLReader.ParagraphAction;
-
 public class Solution {
+
 	public static void main(String[] args) {
 		TreeNode n1 = new TreeNode(1);
 		TreeNode n2 = new TreeNode(2);
@@ -36,35 +37,90 @@ public class Solution {
 		l3.next = l4;
 		l5.next = l3;
 		l6.next = l5;
-		char[] a = {'a'};
+		char[] a = { 'a' };
 		char[] b = { 'a', '.' };
-		System.out.println(new Solution().match(a, b));
+		int[] num = { 2, 3, 4, 2, 6, 2, 5, 1 };
+		System.out.println(new Solution().maxInWindows(num, 3));
 	}
 
-	LinkedList<Integer> numbers=new LinkedList<Integer>();
-	
-	public void Insert(Integer num) {
-	    if(numbers.size()==0){
-	    	numbers.add(num);
-	    }else{
-	    	int end=numbers.size()-1;
-	    	if(numbers.get(end)<=num){
-	    		numbers.add(num);
-	    	}else{
-	    		for(int i=0;i<=end;i++){
-	    			
-	    		}
-	    	}
-	    }
-	    
-    }
+	public boolean hasPath(char[] matrix, int rows, int cols, char[] str) {
+		Character[][] arrays = new Character[rows][cols];
+		int left = 0;
+		int right = cols - 1;
+		int top = 0;
+		int bottom = rows - 1;
+		int i = 0;
+		int j = 0;
+		int count = 0;
+		Map<Character, Boolean> map = new HashMap<Character, Boolean>();
+		for (int x = 0; x < rows; x++) {
+			for (int y = 0; y < cols; y++) {
+				arrays[x][y] = matrix[count++];
+				map.put(arrays[x][y], false);
+			}
+		}
+		int start = 0;
+		while (i <= bottom && j <= right) {
+			if(arrays[i][i]==str[i]){
+				map.put(arrays[i][j], true);
+			}
+		}
+	}
 
-    public Double GetMedian() {
-        
-    }
-	
-	
-	
+	public ArrayList<Integer> maxInWindows(int[] num, int size) {
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		if (num == null || num.length == 0 || size == 0) {
+			return list;
+		}
+		int count = num.length - size + 1;// 滑动的次数
+		for (int i = 0; i < count; i++) {
+			list.add(getMax(Arrays.copyOfRange(num, i, i + size)));
+		}
+		return list;
+	}
+
+	public int getMax(int[] num) {
+		if (num.length == 1) {
+			return num[0];
+		}
+		int max = num[0];
+		for (int i = 1; i < num.length; i++) {
+			if (num[i] >= max) {
+				max = num[i];
+			}
+		}
+		return max;
+	}
+
+	LinkedList<Integer> numbers = new LinkedList<Integer>();
+
+	public void Insert(Integer num) {
+		if (numbers.size() == 0) {
+			numbers.add(num);
+		} else {
+			int end = numbers.size() - 1;
+			if (numbers.get(end) <= num) {
+				numbers.add(num);
+			} else {
+				for (int i = 0; i <= end; i++) {
+					if (num <= numbers.get(i)) {
+						numbers.add(i, num);
+						break;
+					}
+				}
+			}
+		}
+
+	}
+
+	public Double GetMedian() {
+		if (numbers.size() % 2 == 0) {
+			return Double.valueOf((numbers.get(numbers.size() / 2) + numbers.get(numbers.size() / 2 - 1))) / 2;
+		} else {
+			return Double.valueOf(numbers.get(numbers.size() / 2));
+		}
+	}
+
 	public boolean match(char[] str, char[] pattern) {
 
 		if (str.length == 0 && pattern.length == 0) {
@@ -93,12 +149,12 @@ public class Solution {
 				}
 			}
 		}
-		
+
 		if ((i <= str.length - 1 && j > pattern.length - 1) || (i > str.length - 1 && j <= pattern.length - 1)) {
-			if(j == pattern.length - 2 && pattern[j]=='*'){
+			if (j == pattern.length - 2 && pattern[j] == '*') {
 				return true;
 			}
-			if(j == pattern.length - 3 && pattern[j+2]=='*'){
+			if (j == pattern.length - 3 && pattern[j + 2] == '*') {
 				return true;
 			}
 			return false;
