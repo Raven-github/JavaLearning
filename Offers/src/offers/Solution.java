@@ -2,6 +2,7 @@ package offers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -13,19 +14,19 @@ import java.util.Stack;
 public class Solution {
 
 	public static void main(String[] args) {
-		TreeNode n1 = new TreeNode(1);
-		TreeNode n2 = new TreeNode(2);
-		TreeNode n3 = new TreeNode(3);
-		TreeNode n4 = new TreeNode(4);
-		TreeNode n5 = new TreeNode(5);
+		TreeNode n1 = new TreeNode(5);
+		TreeNode n2 = new TreeNode(3);
+		TreeNode n3 = new TreeNode(7);
+		TreeNode n4 = new TreeNode(2);
+		TreeNode n5 = new TreeNode(4);
 		TreeNode n6 = new TreeNode(6);
-		TreeNode n7 = new TreeNode(7);
-		n1.right = n2;
-		n1.left = n3;
-		n3.left = null;
-		n3.right = null;
-		n2.left = n6;
-		n2.right = null;
+		TreeNode n7 = new TreeNode(8);
+		n1.right = n3;
+		n1.left = n2;
+		n3.left = n6;
+		n3.right = n7;
+		n2.left = n4;
+		n2.right = n5;
 		ListNode l1 = new ListNode(1);
 		ListNode l2 = new ListNode(2);
 		ListNode l3 = new ListNode(3);
@@ -37,34 +38,263 @@ public class Solution {
 		l3.next = l4;
 		l5.next = l3;
 		l6.next = l5;
-		char[] a = { 'a' };
-		char[] b = { 'a', '.' };
-		int[] num = { 2, 3, 4, 2, 6, 2, 5, 1 };
-		System.out.println(new Solution().maxInWindows(num, 3));
+		int[] a = { 364, 637, 341, 406, 747, 995, 234, 971, 571, 219, 993, 407, 416, 366, 315, 301, 601, 650, 418, 355,
+				460, 505, 360, 965, 516, 648, 727, 667, 465, 849, 455, 181, 486, 149, 588, 233, 144, 174, 557, 67, 746,
+				550, 474, 162, 268, 142, 463, 221, 882, 576, 604, 739, 288, 569, 256, 936, 275, 401, 497, 82, 935, 983,
+				583, 523, 697, 478, 147, 795, 380, 973, 958, 115, 773, 870, 259, 655, 446, 863, 735, 784, 3, 671, 433,
+				630, 425, 930, 64, 266, 235, 187, 284, 665, 874, 80, 45, 848, 38, 811, 267, 575 };
+		int[] b = { 4, 3, 2, 1, 0 };
+		int[] c = { 1, 2, 3, 4, 5, 6, 7, 0 };
+		// System.out.println(new Solution().InversePairs(a));
+		char[] chars = { 'a', 'b', 'c', 'e', 's', 'f', 'c', 's', 'a', 'd', 'e', 'e' };
+		char[] path = { 'b', 'c', 'c', 'e', 'd' };
+		// System.out.println(new Solution().newHasPath(chars, 3, 4, path));
+		System.out.println(new Solution().movingCount(4, 4, 3));
+	}
+
+	public int movingCount(int threshold, int rows, int cols) {
+		if (rows == 0 || cols == 0) {
+			return 0;
+		}
+		if (threshold == 0) {
+			return 1;
+		}
+		boolean[] flags = new boolean[rows * cols];
+		Arrays.fill(flags, false);
+		return visit(threshold, 0, 0, rows, cols, flags);
+	}
+
+	public int visit(int k, int i, int j, int rows, int cols, boolean[] flags) {
+		if (i >= 0 && i < rows && j >= 0 && j < cols && !flags[i * cols + j] && sumCoint(i, j) <= k) {
+			flags[i * cols + j]=true;
+			return visit(k, i, j + 1, rows, cols, flags) + visit(k, i, j - 1, rows, cols, flags)
+					+ visit(k, i + 1, j, rows, cols, flags) + visit(k, i - 1, j, rows, cols, flags) + 1;
+		} else {
+			return 0;
+		}
+	}
+
+	public int sumCoint(int x, int y) {
+		int sum = 0;
+		while (x != 0) {
+			sum = sum + x % 10;
+			x = x / 10;
+		}
+		while (y != 0) {
+			sum = sum + y % 10;
+			y = y / 10;
+		}
+		return sum;
+	}
+
+	public boolean newHasPath(char[] matrix, int rows, int cols, char[] str) {
+		if (matrix == null || str == null || rows <= 0 || cols <= 0) {
+			return false;
+		}
+		boolean[] flags = new boolean[rows * cols];
+		Arrays.fill(flags, false);
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				if (newVisited(matrix, str, flags, i, j, rows, cols, 0)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public boolean newVisited(char[] chs, char[] str, boolean[] flags, int row, int col, int rows, int cols,
+			int count) {
+		if (count >= str.length) {
+			return true;
+		}
+		boolean flag = false;
+		if (row >= 0 && row < rows && col >= 0 && col < cols && !flags[cols * row + col]
+				&& chs[cols * row + col] == str[count]) {
+			count++;
+			flags[cols * row + col] = true;
+			flag = newVisited(chs, str, flags, row, col - 1, rows, cols, count)
+					|| newVisited(chs, str, flags, row, col + 1, rows, cols, count)
+					|| newVisited(chs, str, flags, row - 1, col, rows, cols, count)
+					|| newVisited(chs, str, flags, row + 1, col, rows, cols, count);
+			if (!flag) {
+				flags[cols * row + col] = false;
+				count--;
+			}
+		}
+		return flag;
 	}
 
 	public boolean hasPath(char[] matrix, int rows, int cols, char[] str) {
-		Character[][] arrays = new Character[rows][cols];
-		int left = 0;
-		int right = cols - 1;
-		int top = 0;
-		int bottom = rows - 1;
-		int i = 0;
-		int j = 0;
-		int count = 0;
-		Map<Character, Boolean> map = new HashMap<Character, Boolean>();
-		for (int x = 0; x < rows; x++) {
-			for (int y = 0; y < cols; y++) {
-				arrays[x][y] = matrix[count++];
-				map.put(arrays[x][y], false);
+		if (matrix == null || str == null || rows <= 0 || cols <= 0) {
+			return false;
+		}
+		boolean[][] flags = new boolean[rows][cols];
+		char[][] chs = new char[rows][cols];
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				flags[i][j] = false;// 没有经过该节点
+				chs[i][j] = matrix[cols * i + j];
 			}
 		}
-		int start = 0;
-		while (i <= bottom && j <= right) {
-			if(arrays[i][i]==str[i]){
-				map.put(arrays[i][j], true);
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				if (visited(chs, str, flags, i, j, rows, cols, 0)) {
+					return true;
+				}
 			}
 		}
+		return false;
+	}
+
+	public boolean visited(char[][] chs, char[] str, boolean[][] flags, int row, int col, int rows, int cols,
+			int count) {
+		if (count >= str.length) {
+			return true;
+		}
+		boolean flag = false;
+		if (row >= 0 && row < rows && col >= 0 && col < cols && !flags[row][col] && chs[row][col] == str[count]) {
+			count++;
+			flags[row][col] = true;
+			flag = visited(chs, str, flags, row, col - 1, rows, cols, count)
+					|| visited(chs, str, flags, row, col + 1, rows, cols, count)
+					|| visited(chs, str, flags, row - 1, col, rows, cols, count)
+					|| visited(chs, str, flags, row + 1, col, rows, cols, count);
+			if (!flag) {
+				flags[row][col] = false;
+				count--;
+			}
+		}
+		return flag;
+	}
+
+	public String PrintMinNumber(int[] numbers) {
+		Comparator<Integer> my = new myCompare();
+		Integer[] nums = new Integer[numbers.length];
+		for (int i = 0; i < numbers.length; i++) {
+			nums[i] = numbers[i];
+		}
+		Arrays.sort(nums, my);
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < numbers.length; i++) {
+			sb.append(nums[i].toString() + ",");
+		}
+		return sb.toString();
+	}
+
+	class myCompare implements Comparator<Integer> {
+
+		@Override
+		public int compare(Integer num1, Integer num2) {
+			String o1 = num1.toString();
+			String o2 = num2.toString();
+			// TODO Auto-generated method stub
+			int len = o1.length() <= o2.length() ? o1.length() : o2.length();
+			int tmp = 0;
+			for (int i = 0; i < len; i++) {
+				if (tmp == 0) {
+					tmp = o1.charAt(i) - o2.charAt(i);
+				}
+			}
+			if (tmp == 0) {
+
+				if (o1.length() > o2.length()) {
+					int i = len;
+					while (i < o1.length()) {
+						if (o1.charAt(i) == o2.charAt(len - 1)) {
+							i++;
+						} else if (o1.charAt(i) >= o2.charAt(len - 1)) {
+							return 1;
+						} else {
+							return -1;
+						}
+					}
+					return -1;
+				} else if (o1.length() < o2.length()) {
+					int i = len;
+					while (i < o2.length()) {
+						if (o2.charAt(i) == o1.charAt(len - 1)) {
+							i++;
+						} else if (o2.charAt(i) >= o1.charAt(len - 1)) {
+							return -1;
+						} else {
+							return 1;
+						}
+					}
+					return 1;
+				} else {
+					return 0;
+				}
+			} else {
+				return tmp;
+			}
+		}
+
+	}
+
+	LinkedList<Character> chs = new LinkedList<>();
+
+	public void Insert(char ch) {
+		chs.add(ch);
+	}
+
+	// return the first appearence once char in current stringstream
+	public char FirstAppearingOnce() {
+		if (chs.size() == 1) {
+			return chs.getLast();
+		}
+		Character[] cs = new Character[chs.size()];
+		for (int i = 0; i < cs.length; i++) {
+			cs[i] = chs.get(i);
+		}
+		Arrays.sort(cs);
+		Set<Character> set = new HashSet<>();
+
+		for (int i = 0; i < cs.length; i++) {
+			if (i == 0) {
+				if (cs[i] != cs[i + 1]) {
+					set.add(cs[i]);
+				}
+			} else if (i == cs.length - 1) {
+				if (cs[i] != cs[i - 1]) {
+					set.add(cs[i]);
+				}
+			} else {
+				if (cs[i] != cs[i - 1] && cs[i] != cs[i + 1]) {
+					set.add(cs[i]);
+				}
+			}
+		}
+		for (int i = 0; i < chs.size(); i++) {
+			if (set.contains(chs.get(i))) {
+				return chs.get(i);
+			}
+		}
+		return '#';
+	}
+
+	TreeNode KthNode(TreeNode pRoot, int k) {
+		if (pRoot == null || k == 0) {
+			return null;
+		}
+
+		ArrayList<TreeNode> list = new ArrayList<>();
+		LNR(pRoot, list);
+		if (list.size() < k) {
+			return null;
+		} else {
+			return list.get(k - 1);
+		}
+
+	}
+
+	public void LNR(TreeNode pRoot, ArrayList<TreeNode> list) {
+		if (pRoot == null) {
+			return;
+		}
+		LNR(pRoot.left, list);
+		list.add(pRoot);
+		LNR(pRoot.right, list);
 	}
 
 	public ArrayList<Integer> maxInWindows(int[] num, int size) {
@@ -664,14 +894,40 @@ public class Solution {
 	}
 
 	public int InversePairs(int[] array) {
+		Long s = System.currentTimeMillis();
 		if (array.length == 0 || array == null) {
 			return 0;
 		}
 		int len = array.length;
-		int p = len * (len - 1) / 2;
-		System.out.println(p);
-		return p % 1000000007;
+		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+		for (int i = len - 1; i >= 0; i--) {
+			if (i == len - 1) {
+				map.put(array[i], 0);
+			} else {
+				int[] nums = Arrays.copyOfRange(array, i + 1, array.length);
+				Arrays.sort(nums);
+				int j = nums.length - 1;
+				while (j >= 0) {
+					if (array[i] > nums[j]) {
+						map.put(array[i], map.get(nums[j]) + 1);
+						break;
+					} else {
+						j--;
+						if (j == -1) {
+							map.put(array[i], 0);
+						}
+					}
+				}
 
+			}
+
+		}
+		int p = 0;
+		for (Integer i : map.values()) {
+			p = p + i;
+		}
+		System.out.println(System.currentTimeMillis() - s);
+		return p % 1000000007;
 	}
 
 	public int FirstNotRepeatingChar(String str) {
@@ -947,20 +1203,33 @@ public class Solution {
 		if (pHead == null) {
 			return null;
 		}
-		RandomListNode newHead = pHead;
-		RandomListNode lastNode = pHead;
-		RandomListNode tempNode = pHead.next;
-		while (tempNode != null) {
-			lastNode.next = tempNode;
-			lastNode = tempNode;
-			tempNode.next = tempNode;
+		ArrayList<RandomListNode> list = new ArrayList<RandomListNode>();
+		ArrayList<RandomListNode> newList = new ArrayList<RandomListNode>();
+		RandomListNode newHead = new RandomListNode(pHead.label);
+		list.add(pHead);
+		newList.add(newHead);
+		RandomListNode lastHead = newHead;
+		newHead = null;
+		RandomListNode temp = pHead.next;
+		while (temp != null) {
+			RandomListNode node = new RandomListNode(temp.label);
+			lastHead.next = node;
+			lastHead = node;
+			list.add(temp);
+			newList.add(node);
+			temp = temp.next;
 		}
-		tempNode = newHead.next;
-		pHead = pHead.next;
-		while (tempNode != null) {
-			tempNode.random = pHead.random;
-			tempNode = tempNode.next;
-			pHead = pHead.next;
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).random == null) {
+				newList.get(i).random = null;
+			} else {
+				for (int j = 0; j < list.size(); j++) {
+					if (list.get(i).random == list.get(j)) {
+						newList.get(i).random = newList.get(j);
+					}
+				}
+			}
+
 		}
 		return newHead;
 	}
