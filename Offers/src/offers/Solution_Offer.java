@@ -11,6 +11,8 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
 
+import javax.swing.text.html.HTMLDocument.HTMLReader.ParagraphAction;
+
 public class Solution_Offer {
 
 	public static void main(String[] args) {
@@ -397,7 +399,6 @@ public class Solution_Offer {
 	}
 
 	public boolean match(char[] str, char[] pattern) {
-
 		if (str.length == 0 && pattern.length == 0) {
 			return true;
 		}
@@ -408,7 +409,7 @@ public class Solution_Offer {
 		if (str.length == 0 && pattern.length == 2 && pattern[1] == '*') {
 			return true;
 		}
-		if(str.length>0 && pattern.length==0){
+		if (str.length > 0 && pattern.length == 0) {
 			return false;
 		}
 		int i = 0;
@@ -428,21 +429,26 @@ public class Solution_Offer {
 			}
 		}
 
-		if (i < str.length - 1) {
+		if (i <=str.length - 1) {
 			return false;
 		}
-		if (pattern.length - 1 - j == 1) {
-			if (pattern[j] == '.' && pattern[j + 1] == '*') {
+		while (j < pattern.length) {
+			if (j == pattern.length - 1 && pattern[j] == '*') {
 				return true;
+			} else if (pattern[j] != '*') {
+				if(j+1<=pattern.length-1 && pattern[j+1]=='*'){
+					j=j+2;
+				}else{
+					return false;
+				}
+			} else {
+				j++;
 			}
 		}
-		if (pattern.length - 1 - j == 0) {
-			if (pattern[j] == '.') {
-				return false;
-			}else if(pattern[j] == '*'){
-				return true;
-			}
-		}
+		return true;
+	}
+
+	public boolean matchCore(char[] str, char[] pattern) {
 
 		return true;
 	}

@@ -1,6 +1,8 @@
 package offers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -13,17 +15,145 @@ public class Solution {
 		TreeNode n5 = new TreeNode(4);
 		TreeNode n6 = new TreeNode(6);
 		TreeNode n7 = new TreeNode(8);
-		TreeNode n8 = new TreeNode(10);
+//		/TreeNode n8 = new TreeNode(10);
 		n1.right = n3;
 		n1.left = n2;
 		n3.left = n6;
 		n3.right = n7;
 		n2.left = n4;
 		n2.right = n5;
-		// n5.left=n8;
-		System.out.println(new Solution().maxDepthQueue(n1));
-		int[] a = { 1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5 };
-		System.out.println(new Solution().singleNumber_two(a));
+		ListNode l1 = new ListNode(1);
+		ListNode l2 = new ListNode(2);
+		ListNode l3 = new ListNode(3);
+		ListNode l4 = new ListNode(2);
+		ListNode l5 = new ListNode(5);
+		ListNode l6 = new ListNode(7);
+		ListNode l7 = new ListNode(5);
+		ListNode l8 = new ListNode(3);
+		l1.next = l2;
+		l2.next = l3;
+		l3.next = l4;
+		l4.next = l5;
+		l5.next = l6;
+		l6.next = l7;
+		l7.next = l8;
+		ListNode head = new Solution().sortList(l1);
+		while(head!=null){
+			System.out.println(head.val);
+			head=head.next;
+		}
+	}
+
+	/***
+	 * Sort a linked list in O(n log n) time using constant space complexity.
+	 * 
+	 * @param head
+	 * @return
+	 */
+	public ListNode sortList(ListNode head) {
+		if (head == null || head.next==null) {
+			return head;
+		}
+//		ListNode right = getMid(head);
+//		ListNode rightNext = right.next;
+//		right.next = null;
+//		return merget(sortList(head), sortList(rightNext));
+////        ListNode mid = getMid(head);
+////        ListNode midNext = mid.next;
+////        mid.next = null;
+////        return mergeSort(sortList(head), sortList(midNext));
+		ArrayList<Integer> list=new ArrayList<>();
+		while(head!=null){
+			list.add(head.val);
+			head=head.next;
+		}
+		Collections.sort(list);
+		ListNode newHead=new ListNode(list.get(0));
+		ListNode tempNode=newHead;
+		for(int i=1;i<list.size();i++){
+			ListNode temp=new ListNode(list.get(i));
+			tempNode.next=temp;
+			tempNode=temp;
+		}
+		return newHead;
+	}
+
+	public ListNode getMiddelHead(ListNode head) {
+		if (head == null) {
+			return null;
+		}
+		ListNode fast = head;
+		ListNode slow = head;
+		while (fast.next != null && fast.next.next != null) {
+			slow = slow.next;
+			fast = fast.next.next;
+		}
+		return slow;
+	}
+
+	public ListNode merget(ListNode oneL, ListNode twoL) {
+		if (oneL == null) {
+			return twoL;
+		} else if (twoL == null) {
+			return oneL;
+		}
+		ListNode one=oneL;
+		ListNode two=twoL;
+		ListNode newList =new ListNode(0);
+		ListNode tempNode = newList;
+		while (one != null && two != null) {
+			if (one.val <= two.val) {
+				tempNode.next = one;
+				one = one.next;
+			} else {
+				tempNode.next = two;
+				two = two.next;
+			}
+			tempNode=tempNode.next;
+		}
+		if (one != null) {
+			tempNode.next = one;
+		}
+		if (two != null) {
+			tempNode.next = two;
+		}
+		return newList.next;
+	}
+
+	private ListNode getMid(ListNode head) {
+		if (head == null || head.next == null) {
+			return head;
+		}
+		ListNode slow = head, quick = head;
+		while (quick.next != null && quick.next.next != null) {
+			slow = slow.next;
+			quick = quick.next.next;
+		}
+		return slow;
+	}
+
+	private ListNode mergeSort(ListNode n1, ListNode n2) {
+		ListNode preHead = new ListNode(0);
+		ListNode cur1 = n1;
+		ListNode cur2 = n2;
+		ListNode cur = preHead;
+		while (cur1 != null && cur2 != null) {
+			if (cur1.val < cur2.val) {
+				cur.next = cur1;
+				cur1 = cur1.next;
+			} else {
+				cur.next = cur2;
+				cur2 = cur2.next;
+			}
+			cur = cur.next;
+		}
+		if (cur1 != null) {
+			cur.next = cur1;
+		}
+		if (cur2 != null) {
+			cur.next = cur2;
+		}
+		return preHead.next;
 	}
 
 	/***
@@ -54,14 +184,16 @@ public class Solution {
 		}
 		return 0;
 	}
+
 	/***
 	 * 异或的方法找到出现次数为1的数
+	 * 
 	 * @return
 	 */
-	public int singleNumber_two(int[] A){
-		int res=0;
-		for(int i=0;i<A.length;i++){
-			res=res^A[i];
+	public int singleNumber_two(int[] A) {
+		int res = 0;
+		for (int i = 0; i < A.length; i++) {
+			res = res ^ A[i];
 		}
 		return res;
 	}
