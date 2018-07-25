@@ -1,5 +1,6 @@
 package offers;
 
+import java.time.chrono.MinguoChronology;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -15,21 +16,22 @@ public class Solution {
 		TreeNode n5 = new TreeNode(4);
 		TreeNode n6 = new TreeNode(6);
 		TreeNode n7 = new TreeNode(8);
-//		/TreeNode n8 = new TreeNode(10);
+		// /TreeNode n8 = new TreeNode(10);
 		n1.right = n3;
 		n1.left = n2;
 		n3.left = n6;
 		n3.right = n7;
 		n2.left = n4;
 		n2.right = n5;
-		ListNode l1 = new ListNode(1);
-		ListNode l2 = new ListNode(2);
-		ListNode l3 = new ListNode(3);
-		ListNode l4 = new ListNode(2);
-		ListNode l5 = new ListNode(5);
-		ListNode l6 = new ListNode(7);
-		ListNode l7 = new ListNode(5);
-		ListNode l8 = new ListNode(3);
+		ListNode l1 = new ListNode(0);
+		ListNode l2 = new ListNode(1);
+		ListNode l3 = new ListNode(2);
+		ListNode l4 = new ListNode(3);
+		ListNode l5 = new ListNode(4);
+		ListNode l6 = new ListNode(5);
+		ListNode l7 = new ListNode(6);
+		ListNode l8 = new ListNode(7);
+		ListNode l9 = new ListNode(8);
 		l1.next = l2;
 		l2.next = l3;
 		l3.next = l4;
@@ -37,13 +39,105 @@ public class Solution {
 		l5.next = l6;
 		l6.next = l7;
 		l7.next = l8;
-		ListNode head = new Solution().sortList(l1);
-		while(head!=null){
-			System.out.println(head.val);
-			head=head.next;
-		}
+		//l8.next = l9;
+
+		new Solution().reorderList(l1);
+
 	}
 
+	public void reorderList(ListNode head) {
+		if (head == null || head.next == null || head.next.next == null) {
+			return;
+		}
+		// 找到中间节点
+		ListNode slow = head, fast = head;
+		while (fast.next != null && fast.next.next != null) {
+			slow = slow.next;
+			fast = fast.next.next;
+		}
+		ListNode rightHead = slow.next;
+		slow.next = null;
+		// 反转链表后半部分
+		ListNode temp = rightHead;
+		rightHead = rightHead.next;
+		temp.next = null;
+		while (rightHead != null) {
+			ListNode tp = rightHead;
+			rightHead = rightHead.next;
+			tp.next = temp;
+			temp = tp;
+		}
+		rightHead = temp;// 反转成功，开始合并
+		boolean flag = true;
+		ListNode newHead = new ListNode(0);
+		ListNode cur = newHead;
+		while (head != null || rightHead != null) {
+			if (flag) {
+				ListNode tm = head;
+				head = head.next;
+				cur.next = tm;
+				cur = tm;
+				flag = !flag;
+			} else {
+				ListNode tm = rightHead;
+				rightHead = rightHead.next;
+				cur.next = tm;
+				cur = tm;
+				flag = !flag;
+			}
+		}
+		head = newHead.next;
+	}
+
+	public void print(ListNode head){
+		ListNode temp=head;
+		while(temp!=null){
+			System.out.println(temp.val);
+			temp=temp.next;
+		}
+		System.out.println("------------------");
+	}
+	/***
+	 * Given a singly linked list L: L 0→L 1→…→L n-1→L n, reorder it to: L 0→L n
+	 * →L 1→L n-1→L 2→L n-2→…
+	 * 
+	 * You must do this in-place without altering the nodes' values.
+	 * 
+	 * For example, Given{1,2,3,4}, reorder it to{1,4,2,3}.
+	 * 
+	 * @param head
+	 */
+	/*
+	 * public void reorderList(ListNode head) { if(head==null || head.next==null
+	 * || head.next.next==null){ return ; } ListNode[] res = divideList(head);
+	 * ListNode left = res[0], right = res[1], midNode = res[2]; if (midNode ==
+	 * null) { boolean flag = true; ListNode temp = right; right = right.next;
+	 * temp.next = null; while (left != null || right != null) { if (flag) {
+	 * ListNode tm = left; left = left.next; tm.next = temp; temp = tm; flag =
+	 * !flag; } else { ListNode tm = right; right = right.next; tm.next = temp;
+	 * temp = tm; flag = !flag; } } head = temp; } else { boolean flag=false;
+	 * while (left != null || right != null) { if (flag) { ListNode tm = left;
+	 * left = left.next; tm.next = midNode; midNode = tm; flag = !flag; } else {
+	 * ListNode tm = right; right = right.next; tm.next = midNode; midNode = tm;
+	 * flag = !flag; } } head = midNode; } while(head!=null){
+	 * System.out.println(head.val); head=head.next; } }
+	 * 
+	 * public ListNode[] divideList(ListNode head) { ListNode left = null, right
+	 * = null, midNode = null; if (head == null) { return null; } ListNode slow
+	 * = head, fast = head, temp = head; while (fast.next != null &&
+	 * fast.next.next != null) { slow = slow.next; fast = fast.next.next; }
+	 * right = slow.next;
+	 * 
+	 * if (fast.next == null) { ListNode tn = temp.next; temp.next = null;
+	 * ListNode flag = slow; while (tn != flag) { ListNode tp = tn.next; tn.next
+	 * = temp; temp = tn; tn = tp; } left = temp; midNode = slow; midNode.next =
+	 * null; } else { left = slow; ListNode tn = temp.next; temp.next = null;
+	 * ListNode flag = slow.next; while (tn != flag) { ListNode tp = tn.next;
+	 * tn.next = temp; temp = tn; tn = tp; } midNode = null;
+	 * 
+	 * } ListNode[] res = new ListNode[3]; res[0] = left; res[1] = right; res[2]
+	 * = midNode; return res; }
+	 */
 	/***
 	 * Sort a linked list in O(n log n) time using constant space complexity.
 	 * 
@@ -51,29 +145,29 @@ public class Solution {
 	 * @return
 	 */
 	public ListNode sortList(ListNode head) {
-		if (head == null || head.next==null) {
+		if (head == null || head.next == null) {
 			return head;
 		}
-//		ListNode right = getMid(head);
-//		ListNode rightNext = right.next;
-//		right.next = null;
-//		return merget(sortList(head), sortList(rightNext));
-////        ListNode mid = getMid(head);
-////        ListNode midNext = mid.next;
-////        mid.next = null;
-////        return mergeSort(sortList(head), sortList(midNext));
-		ArrayList<Integer> list=new ArrayList<>();
-		while(head!=null){
+		// ListNode right = getMid(head);
+		// ListNode rightNext = right.next;
+		// right.next = null;
+		// return merget(sortList(head), sortList(rightNext));
+		//// ListNode mid = getMid(head);
+		//// ListNode midNext = mid.next;
+		//// mid.next = null;
+		//// return mergeSort(sortList(head), sortList(midNext));
+		ArrayList<Integer> list = new ArrayList<>();
+		while (head != null) {
 			list.add(head.val);
-			head=head.next;
+			head = head.next;
 		}
 		Collections.sort(list);
-		ListNode newHead=new ListNode(list.get(0));
-		ListNode tempNode=newHead;
-		for(int i=1;i<list.size();i++){
-			ListNode temp=new ListNode(list.get(i));
-			tempNode.next=temp;
-			tempNode=temp;
+		ListNode newHead = new ListNode(list.get(0));
+		ListNode tempNode = newHead;
+		for (int i = 1; i < list.size(); i++) {
+			ListNode temp = new ListNode(list.get(i));
+			tempNode.next = temp;
+			tempNode = temp;
 		}
 		return newHead;
 	}
@@ -97,9 +191,9 @@ public class Solution {
 		} else if (twoL == null) {
 			return oneL;
 		}
-		ListNode one=oneL;
-		ListNode two=twoL;
-		ListNode newList =new ListNode(0);
+		ListNode one = oneL;
+		ListNode two = twoL;
+		ListNode newList = new ListNode(0);
 		ListNode tempNode = newList;
 		while (one != null && two != null) {
 			if (one.val <= two.val) {
@@ -109,7 +203,7 @@ public class Solution {
 				tempNode.next = two;
 				two = two.next;
 			}
-			tempNode=tempNode.next;
+			tempNode = tempNode.next;
 		}
 		if (one != null) {
 			tempNode.next = one;
