@@ -1,11 +1,14 @@
 package offers;
 
-import java.time.chrono.MinguoChronology;
+import java.awt.HeadlessException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Random;
+
+import javax.xml.transform.Templates;
 
 public class Solution {
 	public static void main(String[] args) {
@@ -23,15 +26,25 @@ public class Solution {
 		n3.right = n7;
 		n2.left = n4;
 		n2.right = n5;
-		ListNode l1 = new ListNode(0);
+		ListNode l1 = new ListNode(10);
 		ListNode l2 = new ListNode(1);
-		ListNode l3 = new ListNode(2);
+		ListNode l3 = new ListNode(11);
 		ListNode l4 = new ListNode(3);
 		ListNode l5 = new ListNode(4);
 		ListNode l6 = new ListNode(5);
 		ListNode l7 = new ListNode(6);
 		ListNode l8 = new ListNode(7);
 		ListNode l9 = new ListNode(8);
+		int i = 1;
+		ListNode head = new ListNode(0);
+		ListNode temp = head;
+		while (i < 1000) {
+			ListNode tm = new ListNode(i);
+			tm.next = null;
+			temp.next = tm;
+			temp = tm;
+			i++;
+		}
 		l1.next = l2;
 		l2.next = l3;
 		l3.next = l4;
@@ -39,9 +52,348 @@ public class Solution {
 		l5.next = l6;
 		l6.next = l7;
 		l7.next = l8;
-		//l8.next = l9;
+		l8.next = null;
+		// l8.next = l9;
+		RandomListNode r1 = new RandomListNode(1);
+		RandomListNode r2 = new RandomListNode(2);
+		RandomListNode r3 = new RandomListNode(3);
+		RandomListNode r4 = new RandomListNode(4);
+		RandomListNode r5 = new RandomListNode(5);
+		RandomListNode r6 = new RandomListNode(6);
+		r1.next = r2;
+		r2.next = r3;
+		r3.next = r4;
+		r4.next = r5;
+		r5.next = r6;
+		r6.next = null;
+		r1.random = r4;
+		r2.random = r5;
+		r5.random = r3;
+		// TreeNode tree = new Solution().sortedListToBST(l1);
+		// Solution.visitLNR(tree);
+		// Solution.print(new Solution().reverseBetween(l1, 1, 7));
+		ListNode hh = new Solution().partition(head, 7);
+		Solution.print(hh);
 
-		new Solution().reorderList(l1);
+	}
+
+	/**
+	 * 
+	 * @param head
+	 * @param x
+	 * @return
+	 */
+	public ListNode partition(ListNode head, int x) {
+		if (head == null) {
+			return null;
+		}
+		ListNode list = head, less = null, more = null, lessHead = null, moreHead = null;
+		while (list != null) {
+			if (list.val < x) {
+				if (less == null) {
+					less = list;
+					
+					lessHead = less;
+				} else {
+					less.next = list;
+					
+					less = less.next;
+				}
+			} else if (list.val >= x) {
+				if (more == null) {
+					more = list;
+					moreHead = more;
+				} else {
+					more.next = list;
+					more = more.next;
+				}
+			}
+			list=list.next;
+		}
+		if (lessHead == null) {
+			return moreHead;
+		}
+		less.next = moreHead;
+		if (more != null) {
+			more.next = null;
+		}
+		return lessHead;
+	}
+
+	/***
+	 * Reverse a linked list from position m to n. Do it in-place and in
+	 * one-pass.
+	 * 
+	 * @param head
+	 * @param m
+	 * @param n
+	 * @return
+	 */
+	public ListNode reverseBetween(ListNode head, int m, int n) {
+		if (head == null || m == n) {
+			return head;
+		}
+		ListNode mH = head, nH = head;
+		int first = n - m;// 先走这些步骤
+		int i = 1;
+		while (i <= first) {
+
+			nH = nH.next;
+			i++;
+		}
+		i = 1;
+		ListNode preMH = null;
+		while (i < m) {
+			preMH = mH;
+			mH = mH.next;
+			nH = nH.next;
+			i++;
+		}
+		ListNode partHead = nH.next;
+		nH.next = null;
+		ListNode temp = reverseList(mH, partHead);
+		if (preMH == null) {
+			return temp;
+		}
+		preMH.next = temp;
+		return head;
+	}
+
+	public ListNode reverseList(ListNode head, ListNode part) {
+		ListNode temp = head;
+		head = head.next;
+		temp.next = part;
+		while (head != null) {
+			ListNode tp = head;
+			head = head.next;
+			tp.next = temp;
+			temp = tp;
+		}
+		return temp;
+	}
+
+	/***
+	 * 
+	 * Given a singly linked list where elements are sorted in ascending order,
+	 * convert it to a height balanced BST.
+	 * 
+	 * @param head
+	 * @return
+	 */
+	public TreeNode sortedListToBST(ListNode head) {
+		return makeTree(head);
+	}
+
+	public TreeNode makeTree(ListNode head) {
+		if (head == null) {
+			return null;
+		}
+		if (head.next == null) {
+			TreeNode temp = new TreeNode(head.val);
+			temp.left = null;
+			temp.right = null;
+			return temp;
+		}
+		if (head.next.next == null) {
+			TreeNode root = new TreeNode(head.next.val);
+			TreeNode right = new TreeNode(head.val);
+			root.left = right;
+			root.right = null;
+			right.left = null;
+			right.right = null;
+			return root;
+		}
+		ListNode slow = head, fast = head;
+		ListNode preSlow = slow;
+		while (fast.next != null && fast.next.next != null) {
+			preSlow = slow;
+			slow = slow.next;
+			fast = fast.next.next;
+		}
+		if (fast.next != null) {//
+			preSlow = slow;
+			slow = slow.next;
+		}
+		preSlow.next = null;
+		TreeNode root = new TreeNode(slow.val);
+		root.right = makeTree(slow.next);
+		root.left = makeTree(head);
+		return root;
+	}
+
+	/***
+	 * 二叉树的中序遍历
+	 * 
+	 * @param root
+	 */
+	public static void visitLNR(TreeNode root) {
+		if (root == null) {
+			return;
+		}
+		visitLNR(root.left);
+		System.out.println(root.val);
+		visitLNR(root.right);
+	}
+
+	/***
+	 * Given a linked list, determine if it has a cycle in it.(是否有环)
+	 * 
+	 * @param head
+	 * @return
+	 */
+	public boolean hasCycle(ListNode head) {
+		if (head == null || head.next == null) {
+			return false;
+		}
+		if (head.next == head) {
+			return true;
+		}
+		ListNode fast = head, slow = head;
+		while (fast != null && fast.next != null) {
+			slow = slow.next;
+			fast = fast.next.next;
+			if (fast == slow) {
+				return true;
+			}
+		}
+		if (fast == null || fast.next == null) {
+			return false;
+		}
+		return true;
+	}
+
+	public boolean hasCycle_two(ListNode head) {
+		ListNode p = head;
+		while (p != null) {
+			ListNode aft = p.next;
+			if (aft == head)
+				return true;
+			p.next = head;
+			p = aft;
+		}
+		return false;
+	}
+
+	/***
+	 * 复杂链表的复制
+	 * 
+	 * @param head
+	 * @return
+	 */
+	public RandomListNode copyRandomList(RandomListNode head) {
+		if (head == null) {
+			return null;
+		}
+		ArrayList<RandomListNode> list = new ArrayList<RandomListNode>();
+		ArrayList<RandomListNode> newList = new ArrayList<RandomListNode>();
+		while (head != null) {
+			list.add(head);
+			RandomListNode temp = new RandomListNode(head.label);
+			newList.add(temp);
+			head = head.next;
+		}
+		for (int i = 0; i < list.size(); i++) {
+			if (i == list.size() - 1) {
+				newList.get(i).next = null;
+			} else {
+				newList.get(i).next = newList.get(i + 1);
+			}
+			for (int j = 0; j < list.size(); j++) {
+				if (list.get(i).random == list.get(j)) {
+					newList.get(i).random = newList.get(j);
+				}
+			}
+		}
+		return newList.get(0);
+	}
+
+	public RandomListNode copyRandomList_two(RandomListNode head) {
+		if (head == null) {
+			return null;
+		}
+		RandomListNode temp = head;
+		while (temp != null) {
+			RandomListNode tp = new RandomListNode(temp.label);
+			tp.random = temp.random;
+			tp.next = temp.next;
+			temp.next = tp;
+			temp = temp.next.next;
+		}
+		temp = head.next;
+		while (temp != null) {
+			if (temp.random != null) {
+				temp.random = temp.random.next;
+			}
+			if (temp.next != null && temp.next.next != null) {
+				temp = temp.next.next;
+			} else {
+				break;
+			}
+		}
+		temp = head.next;
+		RandomListNode newHead = new RandomListNode(0);
+		RandomListNode cur = newHead;
+		while (temp != null) {
+			cur.next = temp;
+			cur = cur.next;
+			if (temp.next != null && temp.next.next != null) {
+				temp = temp.next.next;
+			} else {
+				break;
+			}
+		}
+		return newHead.next;
+	}
+
+	public ListNode detectCycle(ListNode head) {
+		if (head == null) {
+			return null;
+		}
+		ListNode fast = head, slow = head;
+		while (fast.next != null && fast.next.next != null) {
+			slow = slow.next;
+			fast = fast.next.next;
+			if (fast == slow) {
+				break;
+			}
+		}
+		if (fast.next == null || fast.next.next == null) {// 说明没有循环链表
+			return null;
+		}
+		slow = head;
+		while (slow != fast) {
+			slow = slow.next;
+			fast = fast.next;
+		}
+		return fast;
+	}
+
+	public void reorderList_two(ListNode head) {
+		if (head == null || head.next == null) {
+			return;
+		}
+		LinkedList<ListNode> list = new LinkedList<ListNode>();
+		while (head != null) {
+			list.add(head);
+			head = head.next;
+		}
+		ListNode newHead = new ListNode(0);
+		ListNode cur = newHead;
+		boolean flag = true;
+		while (!list.isEmpty()) {
+			if (list.size() == 1) {
+				list.getFirst().next = null;
+			}
+			if (flag) {
+				cur.next = list.removeFirst();
+			} else {
+				cur.next = list.removeLast();
+			}
+			cur = cur.next;
+			flag = !flag;
+		}
+
+		head = newHead.next;
 
 	}
 
@@ -89,14 +441,15 @@ public class Solution {
 		head = newHead.next;
 	}
 
-	public void print(ListNode head){
-		ListNode temp=head;
-		while(temp!=null){
+	public static void print(ListNode head) {
+		ListNode temp = head;
+		while (temp != null) {
 			System.out.println(temp.val);
-			temp=temp.next;
+			temp = temp.next;
 		}
 		System.out.println("------------------");
 	}
+
 	/***
 	 * Given a singly linked list L: L 0→L 1→…→L n-1→L n, reorder it to: L 0→L n
 	 * →L 1→L n-1→L 2→L n-2→…
@@ -214,7 +567,7 @@ public class Solution {
 		return newList.next;
 	}
 
-	private ListNode getMid(ListNode head) {
+	public ListNode getMid(ListNode head) {
 		if (head == null || head.next == null) {
 			return head;
 		}
@@ -226,7 +579,7 @@ public class Solution {
 		return slow;
 	}
 
-	private ListNode mergeSort(ListNode n1, ListNode n2) {
+	public ListNode mergeSort(ListNode n1, ListNode n2) {
 		ListNode preHead = new ListNode(0);
 		ListNode cur1 = n1;
 		ListNode cur2 = n2;
